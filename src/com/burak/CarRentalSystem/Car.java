@@ -1,7 +1,6 @@
-package com.burak.CarRentalSystem; // Ось твоя правильна назва
+package com.burak.CarRentalSystem;
 
 public class Car {
-    // ... весь інший код залишається таким самим ...
     private String id;
     private String brand;
     private String model;

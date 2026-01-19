@@ -4,12 +4,12 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        // Підключаємо наш сервіс (базу даних)
+
         CarRentalService service = new CarRentalService();
-        // Вмикаємо сканер (читання з клавіатури)
+
         Scanner scanner = new Scanner(System.in);
 
-        Customer currentUser = null; // Тут буде зберігатися той, хто увійшов
+        Customer currentUser = null;
 
         while (true) {
             System.out.println("\n=== МЕНЮ ===");
@@ -72,7 +72,7 @@ public class Main {
 
                 case "0":
                     System.out.println("До побачення!");
-                    return; // Завершує програму
+                    return;
 
                 default:
                     System.out.println("Невідома команда.");

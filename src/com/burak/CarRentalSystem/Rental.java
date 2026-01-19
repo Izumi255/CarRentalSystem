@@ -3,8 +3,8 @@ package com.burak.CarRentalSystem;
 public class Rental {
     private Car car;
     private Customer customer;
-    private int hours;       // На скільки годин беруть
-    private double totalPrice; // Загальна вартість
+    private int hours;
+    private double totalPrice;
 
     public Rental(Car car, Customer customer, int hours) {
         this.car = car;

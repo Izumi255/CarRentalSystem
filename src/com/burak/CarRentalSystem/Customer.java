@@ -1,12 +1,12 @@
 package com.burak.CarRentalSystem;
 
 public class Customer {
-    // Поля (характеристики) з нашої діаграми
+
     private String id;
-    private String name;      // ПІБ
-    private String phone;     // Телефон
-    private String passport;  // Паспорт
-    private double balance;   // Гроші (Євро)
+    private String name;
+    private String phone;
+    private String passport;
+    private double balance;
 
     // Конструктор
     public Customer(String id, String name, String phone, String passport, double balance) {
@@ -17,7 +17,7 @@ public class Customer {
         this.balance = balance;
     }
 
-    // Геттери (щоб дізнатися ім'я та баланс)
+
     public String getName() {
         return name;
     }
@@ -34,7 +34,7 @@ public class Customer {
         }
     }
 
-    // МЕТОД 2: Списання грошей (повертає true, якщо успішно, і false, якщо мало грошей)
+
     public boolean charge(double amount) {
         if (this.balance >= amount) {
             this.balance -= amount;
