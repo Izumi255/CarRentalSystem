@@ -14,7 +14,7 @@ public class Rental {
     public Rental(Car car, User user, int days) {
         this.id = "RENT-" + (int)(Math.random() * 10000);
         this.car = car;
-        this.user = user; // <--- І ТУТ
+        this.user = user;
         this.days = days;
 
         // Розрахунок ціни

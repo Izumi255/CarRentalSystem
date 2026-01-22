@@ -47,7 +47,6 @@ public class FileRentalRepository implements CrudRepository<Rental> {
 
     @Override
     public void update(Rental entity) {
-        // Оренди зазвичай не змінюють (це чек), тому можна залишити пустим
         saveToFile();
     }
 
@@ -59,7 +58,6 @@ public class FileRentalRepository implements CrudRepository<Rental> {
 
     // --- СПЕЦИФІЧНИЙ ПОШУК ---
 
-    // Знайти всі оренди конкретного користувача
     public List<Rental> getRentalsByUser(String username) {
         return rentals.stream()
                 .filter(rental -> rental.getUser().getUsername().equals(username))

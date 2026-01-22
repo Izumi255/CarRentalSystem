@@ -28,7 +28,6 @@ public class User {
         this.role = role;
     }
 
-    // --- ВАЛІДАЦІЯ ТА ХЕШУВАННЯ ---
 
     public void setUsername(String username) {
         if (username == null || username.trim().isEmpty()) {
@@ -48,7 +47,7 @@ public class User {
         if (password.length() < 3) {
             throw new IllegalArgumentException("❌ Пароль надто слабкий! Мінімум 3 символи.");
         }
-        // Ми не зберігаємо пароль, ми його хешуємо!
+
         this.passwordHash = hashString(password);
     }
 
@@ -58,7 +57,6 @@ public class User {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] encodedhash = digest.digest(input.getBytes(StandardCharsets.UTF_8));
 
-            // Перетворюємо байти у красивий hex-рядок (цифри і букви)
             StringBuilder hexString = new StringBuilder();
             for (byte b : encodedhash) {
                 String hex = Integer.toHexString(0xff & b);
