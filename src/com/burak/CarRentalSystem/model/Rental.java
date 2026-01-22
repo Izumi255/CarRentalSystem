@@ -7,6 +7,9 @@ public class Rental {
     private Payment payment;
     private Review review;
     private int days;
+    public User getUser() {
+        return user;
+    }
 
     public Rental(Car car, User user, int days) {
         this.id = "RENT-" + (int)(Math.random() * 10000);

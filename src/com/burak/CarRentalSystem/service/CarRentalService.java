@@ -1,97 +1,117 @@
 package com.burak.CarRentalSystem.service;
 
 import com.burak.CarRentalSystem.model.*;
+import com.burak.CarRentalSystem.repository.*; // <--- Підключили наші нові репозиторії
 import net.datafaker.Faker;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
+
 import java.util.List;
-import java.util.Locale;
 
 public class CarRentalService {
-    // Списки для зберігання наших даних
-    private List<Car> cars = new ArrayList<>();
-      private List<User> users = new ArrayList<>();
-    private List<Rental> rentals = new ArrayList<>();
+    // Тепер ми використовуємо не List, а Репозиторії (наші "склади")
+    private final CrudRepository<Car> carRepository;
+    private final CrudRepository<User> userRepository;
+    private final FileRentalRepository rentalRepository; // Тут беремо конкретний клас, щоб мати доступ до пошуку по юзеру
 
-    // Генератор випадкових даних
-    private Faker faker = new Faker(new Locale("en"));
+    private final Faker faker;
 
-    //  ДАНИХ
+    public CarRentalService() {
+        // Ініціалізуємо репозиторії. Вони самі підтягнуть дані з файлів!
+        this.carRepository = new FileCarRepository();
+        this.userRepository = new FileUserRepository();
+        this.rentalRepository = new FileRentalRepository();
+        this.faker = new Faker();
+    }
+
+    // --- ГЕНЕРАЦІЯ ТЕСТОВИХ ДАНИХ (Оновлена) ---
     public void generateTestData(int carsCount, int usersCount) {
         System.out.println("🔄 Починаю генерацію даних...");
 
-        //Машини
-        for (int i = 0; i < carsCount; i++) {
-            String id = "CAR-" + faker.number().digits(4);
-            Car newCar = new Car(id, faker.vehicle().manufacturer(), faker.vehicle().model(), faker.number().randomDouble(2, 10, 200));
-            cars.add(newCar);
-        }
-
-        // 2. СтворюємоАдміністратора
-        User admin = new User(
-                "admin",
-                "System Administrator",
-                "admin",
-                "admin@rental.com",
-                "+380-00-000-0000",
-                "Admin Office",
-                Role.ADMIN // <--- Чітко вказуємо роль ADMIN
-        );
-        users.add(admin);
-        System.out.println("🛡️ Створено Адміністратора: логін 'admin', пароль 'admin'");
-
-        for (int i = 0; i < usersCount; i++) {
-            String username = faker.name().firstName().toLowerCase() + faker.number().digits(3);
-            String fullName = faker.name().fullName();
-            String password = "123";
-            String email = faker.internet().emailAddress();
-            String phone = faker.numerify("+380-##-###-####");
-            String address = faker.address().fullAddress();
-
-            User user = new User(username, fullName, password, email, phone, address, Role.CUSTOMER);
-            users.add(user);
-        }
-
-        for (int i = 0; i < usersCount / 2; i++) {
-            User randomUser = users.get(faker.number().numberBetween(0, users.size()));
-
-            if (randomUser.isAdmin()) continue;
-
-            Car randomCar = cars.get(faker.number().numberBetween(0, cars.size()));
-            Rental rental = new Rental(randomCar, randomUser, faker.number().numberBetween(1, 14));
-
-            if (faker.bool().bool()) {
-                rental.leaveReview(faker.number().numberBetween(1, 5), faker.yoda().quote());
+        // 1. Генеруємо Машини (якщо їх ще немає)
+        if (carRepository.getAll().isEmpty()) {
+            for (int i = 0; i < carsCount; i++) {
+                String id = "CAR-" + faker.number().digits(4);
+                Car newCar = new Car(id, faker.vehicle().manufacturer(), faker.vehicle().model(), faker.number().randomDouble(2, 10, 200));
+                carRepository.add(newCar); // <--- Зберігаємо через репозиторій
             }
-            rentals.add(rental);
+            System.out.println("🚗 Машини згенеровано і збережено в cars.json");
+        } else {
+            System.out.println("ℹ️ Машини вже є в базі, пропускаємо генерацію.");
         }
 
-        System.out.println("✅ Дані згенеровано: 1 Адмін та " + usersCount + " Користувачів.");
+        // 2. Створюємо АДМІНА (якщо немає)
+        if (userRepository.getById("admin").isEmpty()) {
+            User admin = new User(
+                    "admin",
+                    "System Administrator",
+                    "admin",
+                    "admin@rental.com",
+                    "+380-00-000-0000",
+                    "Admin Office",
+                    Role.ADMIN
+            );
+            userRepository.add(admin);
+            System.out.println("🛡️ Створено Адміністратора (admin/admin)");
+        }
+
+        // 3. Генеруємо КЛІЄНТІВ (якщо мало)
+        if (userRepository.getAll().size() < usersCount) {
+            for (int i = 0; i < usersCount; i++) {
+                String username = faker.name().firstName().toLowerCase() + faker.number().digits(3);
+                String fullName = faker.name().fullName();
+                String password = "123";
+                String email = faker.internet().emailAddress();
+                String phone = faker.numerify("+380-##-###-####");
+                String address = faker.address().fullAddress();
+
+                User user = new User(username, fullName, password, email, phone, address, Role.CUSTOMER);
+                userRepository.add(user);
+            }
+            System.out.println("👥 Користувачів додано в users.json");
+        }
+
+        // 4. Генеруємо Оренди (для тесту)
+        if (rentalRepository.getAll().isEmpty()) {
+            List<User> allUsers = userRepository.getAll();
+            List<Car> allCars = carRepository.getAll();
+
+            for (int i = 0; i < 5; i++) {
+                User randomUser = allUsers.get(faker.number().numberBetween(0, allUsers.size()));
+                if (randomUser.isAdmin()) continue;
+
+                Car randomCar = allCars.get(faker.number().numberBetween(0, allCars.size()));
+                Rental rental = new Rental(randomCar, randomUser, faker.number().numberBetween(1, 14));
+
+                rentalRepository.add(rental);
+            }
+            System.out.println("📝 Оренди створено в rentals.json");
+        }
+
+        System.out.println("✅ Дані готові.");
     }
 
-    // Друк даних
-    public void printAllData() {
+    // --- МЕТОДИ ДЛЯ РОБОТИ (Тепер просто викликають репозиторії) ---
+
+    public void printAllCars() {
         System.out.println("\n--- 🚗 СПИСОК АВТОМОБІЛІВ ---");
-        for (Car car : cars) System.out.println(car);
-
-        System.out.println("\n--- 👥 СПИСОК КОРИСТУВАЧІВ (Admin/User) ---");
-        for (User user : users) System.out.println(user);
-
-        System.out.println("\n--- 📝 ІСТОРІЯ ОРЕНД ---");
-        for (Rental rental : rentals) System.out.println(rental);
+        List<Car> cars = carRepository.getAll();
+        for (Car car : cars) {
+            System.out.println(car);
+        }
     }
 
-    // Збереження у файл
-    public void saveToJson(String filename) {
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        try (FileWriter writer = new FileWriter(filename)) {
-            gson.toJson(rentals, writer);
-            System.out.println("💾 Успішно збережено у файл: " + filename);
-        } catch (IOException e) {
-            System.err.println("❌ Помилка при записі файлу: " + e.getMessage());
+    public void printAllUsers() {
+        System.out.println("\n--- 👥 СПИСОК КОРИСТУВАЧІВ ---");
+        List<User> users = userRepository.getAll();
+        for (User user : users) {
+            System.out.println(user);
+        }
+    }
+
+    public void printRentalsHistory() {
+        System.out.println("\n--- 📝 ІСТОРІЯ ОРЕНД ---");
+        List<Rental> rentals = rentalRepository.getAll();
+        for (Rental rental : rentals) {
+            System.out.println(rental);
         }
     }
 }
