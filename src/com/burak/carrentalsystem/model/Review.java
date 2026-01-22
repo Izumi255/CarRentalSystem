@@ -1,4 +1,4 @@
-package com.burak.CarRentalSystem.model;
+package com.burak.carrentalsystem.model;
 
 public class Review {
     private String authorName;

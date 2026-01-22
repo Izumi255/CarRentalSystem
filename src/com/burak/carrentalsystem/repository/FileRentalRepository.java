@@ -1,6 +1,6 @@
-package com.burak.CarRentalSystem.repository;
+package com.burak.carrentalsystem.repository;
 
-import com.burak.CarRentalSystem.model.Rental;
+import com.burak.carrentalsystem.model.Rental;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;

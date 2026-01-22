@@ -1,4 +1,4 @@
-package com.burak.CarRentalSystem.model;
+package com.burak.carrentalsystem.model;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;

@@ -1,7 +1,7 @@
-package com.burak.CarRentalSystem.service;
+package com.burak.carrentalsystem.service;
 
-import com.burak.CarRentalSystem.model.*;
-import com.burak.CarRentalSystem.repository.*; // <--- Підключили наші нові репозиторії
+import com.burak.carrentalsystem.model.*;
+import com.burak.carrentalsystem.repository.*; // <--- Підключили наші нові репозиторії
 import net.datafaker.Faker;
 
 import java.util.List;

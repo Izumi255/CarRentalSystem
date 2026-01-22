@@ -1,4 +1,4 @@
-package com.burak.CarRentalSystem.model;
+package com.burak.carrentalsystem.model;
 
 public enum Role {
     ADMIN,      // Адміністратор (може додавати машини)

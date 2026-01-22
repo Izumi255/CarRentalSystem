@@ -1,6 +1,6 @@
-package com.burak.CarRentalSystem;
+package com.burak.carrentalsystem;
 
-import com.burak.CarRentalSystem.service.CarRentalService;
+import com.burak.carrentalsystem.service.CarRentalService;
 
 public class Main {
     public static void main(String[] args) {

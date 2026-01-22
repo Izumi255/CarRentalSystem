@@ -1,10 +1,9 @@
-package com.burak.CarRentalSystem.repository;
+package com.burak.carrentalsystem.repository;
 
-import com.burak.CarRentalSystem.model.User;
+import com.burak.carrentalsystem.model.User;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-
 import java.io.*;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -55,10 +54,8 @@ public class FileUserRepository implements CrudRepository<User> {
             }
         }
     }
-
     @Override
     public boolean delete(String id) {
-        // Видаляємо, якщо знаходимо
         boolean removed = users.removeIf(user -> user.getUsername().equals(id));
         if (removed) {
             saveToFile();
