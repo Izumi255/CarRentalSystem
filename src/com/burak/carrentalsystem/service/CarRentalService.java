@@ -1,13 +1,12 @@
 package com.burak.carrentalsystem.service;
 
 import com.burak.carrentalsystem.model.*;
-import com.burak.carrentalsystem.repository.*; // <--- Підключили наші нові репозиторії
+import com.burak.carrentalsystem.repository.*;
+import java.util.List;
 import net.datafaker.Faker;
 
-import java.util.List;
-
 public class CarRentalService {
-    // Тепер ми використовуємо не List, а Репозиторії (наші "склади")
+
     private final CrudRepository<Car> carRepository;
     private final CrudRepository<User> userRepository;
     private final FileRentalRepository rentalRepository; // Тут беремо конкретний клас, щоб мати доступ до пошуку по юзеру
@@ -22,7 +21,7 @@ public class CarRentalService {
         this.faker = new Faker();
     }
 
-    // --- ГЕНЕРАЦІЯ ТЕСТОВИХ ДАНИХ (Оновлена) ---
+    //ГЕНЕРАЦІЯ ТЕСТОВИХ ДАНИХ
     public void generateTestData(int carsCount, int usersCount) {
         System.out.println("🔄 Починаю генерацію даних...");
 
@@ -30,7 +29,8 @@ public class CarRentalService {
         if (carRepository.getAll().isEmpty()) {
             for (int i = 0; i < carsCount; i++) {
                 String id = "CAR-" + faker.number().digits(4);
-                Car newCar = new Car(id, faker.vehicle().manufacturer(), faker.vehicle().model(), faker.number().randomDouble(2, 10, 200));
+                Car newCar = new Car(id, faker.vehicle().manufacturer(), faker.vehicle().model(),
+                        faker.number().randomDouble(2, 10, 200));
                 carRepository.add(newCar); // <--- Зберігаємо через репозиторій
             }
             System.out.println("🚗 Машини згенеровано і збережено в cars.json");
@@ -63,7 +63,8 @@ public class CarRentalService {
                 String phone = faker.numerify("+380-##-###-####");
                 String address = faker.address().fullAddress();
 
-                User user = new User(username, fullName, password, email, phone, address, Role.CUSTOMER);
+                User user = new User(username, fullName, password, email, phone, address,
+                        Role.CUSTOMER);
                 userRepository.add(user);
             }
             System.out.println("👥 Користувачів додано в users.json");
@@ -76,10 +77,13 @@ public class CarRentalService {
 
             for (int i = 0; i < 5; i++) {
                 User randomUser = allUsers.get(faker.number().numberBetween(0, allUsers.size()));
-                if (randomUser.isAdmin()) continue;
+                if (randomUser.isAdmin()) {
+                    continue;
+                }
 
                 Car randomCar = allCars.get(faker.number().numberBetween(0, allCars.size()));
-                Rental rental = new Rental(randomCar, randomUser, faker.number().numberBetween(1, 14));
+                Rental rental = new Rental(randomCar, randomUser,
+                        faker.number().numberBetween(1, 14));
 
                 rentalRepository.add(rental);
             }
@@ -89,7 +93,7 @@ public class CarRentalService {
         System.out.println("✅ Дані готові.");
     }
 
-    // --- МЕТОДИ ДЛЯ РОБОТИ (Тепер просто викликають репозиторії) ---
+    //МЕТОДИ ДЛЯ РОБОТИ
 
     public void printAllCars() {
         System.out.println("\n--- 🚗 СПИСОК АВТОМОБІЛІВ ---");

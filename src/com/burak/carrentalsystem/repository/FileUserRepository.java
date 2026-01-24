@@ -54,6 +54,7 @@ public class FileUserRepository implements CrudRepository<User> {
             }
         }
     }
+
     @Override
     public boolean delete(String id) {
         boolean removed = users.removeIf(user -> user.getUsername().equals(id));
@@ -63,7 +64,7 @@ public class FileUserRepository implements CrudRepository<User> {
         return removed;
     }
 
-    // --- ДОДАТКОВІ МЕТОДИ (Пошук/Фільтрація) ---
+    //ДОДАТКОВІ МЕТОДИ
 
     public Optional<User> getByEmail(String email) {
         return users.stream()
@@ -71,7 +72,7 @@ public class FileUserRepository implements CrudRepository<User> {
                 .findFirst();
     }
 
-    // --- РОБОТА З ФАЙЛОМ (Приватні методи) ---
+    //РОБОТА З ФАЙЛОМ
 
     private void saveToFile() {
         try (Writer writer = new FileWriter(FILE_PATH)) {
@@ -89,10 +90,13 @@ public class FileUserRepository implements CrudRepository<User> {
 
         try (Reader reader = new FileReader(file)) {
 
-            Type listType = new TypeToken<ArrayList<User>>(){}.getType();
+            Type listType = new TypeToken<ArrayList<User>>() {
+            }.getType();
             users = gson.fromJson(reader, listType);
 
-            if (users == null) users = new ArrayList<>();
+            if (users == null) {
+                users = new ArrayList<>();
+            }
 
         } catch (IOException e) {
             System.err.println("❌ Помилка читання users.json: " + e.getMessage());

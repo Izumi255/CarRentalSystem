@@ -69,15 +69,12 @@ public class FileCarRepository implements CrudRepository<Car> {
     // Знайти всі машини певного бренду (використовуємо getBrand)
     public List<Car> searchByBrand(String brand) {
         return cars.stream()
-                // ТУТ БУЛА ПОМИЛКА: замінили .getMake() на .getBrand()
                 .filter(car -> car.getBrand().equalsIgnoreCase(brand))
                 .collect(Collectors.toList());
     }
 
-    // Фільтр по ціні (використовуємо getPricePerHour)
     public List<Car> filterByPrice(double maxPrice) {
         return cars.stream()
-                // ТУТ ТЕЖ ПОПРАВИМО: замінили .getPricePerDay() на .getPricePerHour()
                 .filter(car -> car.getPricePerHour() <= maxPrice)
                 .collect(Collectors.toList());
     }
@@ -94,12 +91,17 @@ public class FileCarRepository implements CrudRepository<Car> {
 
     private void loadFromFile() {
         File file = new File(FILE_PATH);
-        if (!file.exists()) return;
+        if (!file.exists()) {
+            return;
+        }
 
         try (Reader reader = new FileReader(file)) {
-            Type listType = new TypeToken<ArrayList<Car>>(){}.getType();
+            Type listType = new TypeToken<ArrayList<Car>>() {
+            }.getType();
             cars = gson.fromJson(reader, listType);
-            if (cars == null) cars = new ArrayList<>();
+            if (cars == null) {
+                cars = new ArrayList<>();
+            }
         } catch (IOException e) {
             System.err.println("❌ Помилка читання cars.json: " + e.getMessage());
         }

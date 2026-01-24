@@ -24,7 +24,7 @@ public class FileRentalRepository implements CrudRepository<Rental> {
         loadFromFile();
     }
 
-    // --- CRUD ---
+    //CRUD
 
     @Override
     public void add(Rental rental) {
@@ -34,9 +34,6 @@ public class FileRentalRepository implements CrudRepository<Rental> {
 
     @Override
     public Optional<Rental> getById(String id) {
-        // У Rental немає явного ID (якщо ти не додавав поле id),
-        // тому тут поки повертаємо порожнє, або треба додати id в клас Rental.
-        // Але для MVP нам вистачить просто списку.
         return Optional.empty();
     }
 
@@ -56,7 +53,7 @@ public class FileRentalRepository implements CrudRepository<Rental> {
         return false;
     }
 
-    // --- СПЕЦИФІЧНИЙ ПОШУК ---
+    //СПЕЦИФІЧНИЙ ПОШУК
 
     public List<Rental> getRentalsByUser(String username) {
         return rentals.stream()
@@ -64,7 +61,7 @@ public class FileRentalRepository implements CrudRepository<Rental> {
                 .collect(Collectors.toList());
     }
 
-    // --- ФАЙЛИ ---
+    //ФАЙЛИ
 
     private void saveToFile() {
         try (Writer writer = new FileWriter(FILE_PATH)) {
@@ -76,12 +73,17 @@ public class FileRentalRepository implements CrudRepository<Rental> {
 
     private void loadFromFile() {
         File file = new File(FILE_PATH);
-        if (!file.exists()) return;
+        if (!file.exists()) {
+            return;
+        }
 
         try (Reader reader = new FileReader(file)) {
-            Type listType = new TypeToken<ArrayList<Rental>>(){}.getType();
+            Type listType = new TypeToken<ArrayList<Rental>>() {
+            }.getType();
             rentals = gson.fromJson(reader, listType);
-            if (rentals == null) rentals = new ArrayList<>();
+            if (rentals == null) {
+                rentals = new ArrayList<>();
+            }
         } catch (IOException e) {
             System.err.println("❌ Помилка читання rentals.json: " + e.getMessage());
         }
