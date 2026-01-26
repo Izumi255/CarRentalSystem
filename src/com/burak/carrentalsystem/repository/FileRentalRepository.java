@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 public class FileRentalRepository implements CrudRepository<Rental> {
 
-    private static final String FILE_PATH = "rentals.json";
+    private static final String FILE_PATH = "data/rentals.json";
     private final Gson gson;
     private List<Rental> rentals;
 

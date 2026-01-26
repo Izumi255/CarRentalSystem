@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 public class FileCarRepository implements CrudRepository<Car> {
 
-    private static final String FILE_PATH = "cars.json";
+    private static final String FILE_PATH = "data/cars.json";
     private final Gson gson;
     private List<Car> cars;
 

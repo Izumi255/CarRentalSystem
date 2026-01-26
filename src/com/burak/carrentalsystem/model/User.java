@@ -1,8 +1,9 @@
 package com.burak.carrentalsystem.model;
 
+import java.io.Serializable; // Бажано додати для збереження у файл
 import java.util.UUID;
 
-public class User {
+public class User implements Serializable {
 
     private String id;
     private String username;
@@ -16,7 +17,6 @@ public class User {
     public User(String username, String fullName, String password, String email, String phone,
             String address, Role role) {
         this.id = UUID.randomUUID().toString();
-
         this.username = username;
         this.fullName = fullName;
         this.password = password;
@@ -63,7 +63,7 @@ public class User {
         return role == Role.ADMIN;
     }
 
-    //СЕТЕРИ
+    // --- СЕТЕРИ (Додані ті, яких не вистачало) ---
 
     public void setPassword(String password) {
         this.password = password;
@@ -71,6 +71,19 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    // 👇 ЦІ ТРИ МЕТОДИ БУЛИ ПОТРІБНІ ДЛЯ UserService:
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     @Override

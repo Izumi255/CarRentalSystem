@@ -12,7 +12,7 @@ import java.util.Optional;
 
 public class FileUserRepository implements CrudRepository<User> {
 
-    private static final String FILE_PATH = "users.json";
+    private static final String FILE_PATH = "data/users.json";
     private final Gson gson;
     private List<User> users;
 
