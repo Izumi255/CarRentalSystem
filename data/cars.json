@@ -4,7 +4,15 @@
     "brand": "Mercedes",
     "model": "Civic",
     "pricePerHour": 35.9,
-    "isAvailable": false,
-    "rentEndTime": 1769530646706
+    "isAvailable": true,
+    "rentEndTime": 0
+  },
+  {
+    "id": "ca0484b1-2df8-47fb-a3b2-fe6f7f2cf312",
+    "brand": "Ford",
+    "model": "X5",
+    "pricePerHour": 33.95,
+    "isAvailable": true,
+    "rentEndTime": 0
   }
 ]

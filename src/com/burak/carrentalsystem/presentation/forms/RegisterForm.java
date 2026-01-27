@@ -6,6 +6,7 @@ import com.burak.carrentalsystem.presentation.utils.ConsoleColors;
 import com.burak.carrentalsystem.presentation.utils.SessionManager;
 import com.burak.carrentalsystem.service.UserService;
 
+import java.io.Console;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -25,7 +26,7 @@ public class RegisterForm {
         ConsoleColors.clearScreen();
         printHeader();
 
-        // 1. ЛОГІН (Перевірка на унікальність + мінімум 3 символи)
+        // 1. ЛОГІН
         while (true) {
             username = input("👤 Логін");
             if (username.length() < 3) {
@@ -36,7 +37,7 @@ public class RegisterForm {
                 printError("Цей логін вже зайнятий! Придумайте інший.");
                 continue;
             }
-            break; // Якщо дійшли сюди - все ок, виходимо з циклу
+            break;
         }
 
         // 2. ІМ'Я
@@ -49,31 +50,28 @@ public class RegisterForm {
             break;
         }
 
-        // 3. EMAIL (МИТТЄВА ПЕРЕВІРКА НА ДУБЛІКАТ)
+        // 3. EMAIL
         while (true) {
             email = input("📧 Email");
-
-            // Перевірка на пустоту
             if (email.length() < 5 || !email.contains("@")) {
-                printError("Введіть коректний Email (наприклад, user@mail.com)");
+                printError("Введіть коректний Email!");
                 continue;
             }
-
-            // Перевірка в базі
             String finalEmail = email;
             boolean exists = userService.getAllUsers().stream()
                     .anyMatch(u -> u.getEmail().equalsIgnoreCase(finalEmail));
-
             if (exists) {
-                printError("Цей Email вже зареєстрований у системі!");
+                printError("Цей Email вже зареєстрований!");
                 continue;
             }
             break;
         }
 
-        // 4. ПАРОЛЬ (Мінімум 6 символів)
+        // 4. ПАРОЛЬ (🔥 ТЕПЕР ПРИХОВАНИЙ)
         while (true) {
-            password = input(ConsoleColors.KEY_ICON + " Пароль");
+            // Використовуємо спеціальний метод для пароля
+            password = inputPassword(ConsoleColors.KEY_ICON + " Пароль");
+
             if (password.length() < 6) {
                 printError("Пароль має бути мінімум 6 символів!");
                 continue;
@@ -89,7 +87,7 @@ public class RegisterForm {
                 continue;
             }
             if (phone.length() < 12 || phone.length() > 15) {
-                printError("Невірна довжина номера (має бути 12-15 символів)!");
+                printError("Невірна довжина (має бути 12-15 символів)!");
                 continue;
             }
             break;
@@ -127,7 +125,6 @@ public class RegisterForm {
         }
 
         // --- ЗБЕРЕЖЕННЯ ---
-        // Тут ми вже не боїмося помилок, бо все перевірили вище!
         try {
             UserStoreDto userDto = new UserStoreDto(username, fullName, email, password, phone,
                     address);
@@ -142,20 +139,33 @@ public class RegisterForm {
             return user;
 
         } catch (Exception e) {
-            printError("Щось пішло не так: " + e.getMessage());
+            printError("Помилка: " + e.getMessage());
             return null;
         }
     }
 
-    // --- ДОПОМІЖНІ МЕТОДИ ---
     private String input(String label) {
         System.out.print(
                 ConsoleColors.GREEN_BOLD + "  " + label + ": " + " ".repeat(12 - label.length())
                         + ConsoleColors.RESET + ConsoleColors.ARROW + " ");
-        String text = scanner.nextLine().trim();
-        // Якщо хочеш кнопку виходу, розкоментуй це:
-        // if (text.equals("0")) throw new RuntimeException("BACK");
-        return text;
+        return scanner.nextLine().trim();
+    }
+
+    private String inputPassword(String label) {
+        System.out.print(
+                ConsoleColors.GREEN_BOLD + "  " + label + ": " + " ".repeat(12 - label.length())
+                        + ConsoleColors.RESET + ConsoleColors.ARROW + " ");
+
+        Console console = System.console();
+
+        if (console != null) {
+
+            char[] passwordChars = console.readPassword();
+            return new String(passwordChars);
+        } else {
+
+            return scanner.nextLine().trim();
+        }
     }
 
     private void printError(String message) {

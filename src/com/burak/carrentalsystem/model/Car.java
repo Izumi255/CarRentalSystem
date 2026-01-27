@@ -8,7 +8,6 @@ public class Car {
     private double pricePerHour;
     private boolean isAvailable;
 
-    // 🔥 НОВЕ ПОЛЕ: Час закінчення оренди (у мілісекундах)
     private long rentEndTime;
 
     public Car(String id, String brand, String model, double pricePerHour) {

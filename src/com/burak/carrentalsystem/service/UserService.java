@@ -115,9 +115,8 @@ public class UserService {
         userRepository.add(user);
     }
 
-    // ✅ 7. ОТРИМАТИ ВСІХ (Узгоджено з репозиторієм)
     public List<User> getAllUsers() {
-        return userRepository.getAll(); // Просто повертаємо те, що дає репозиторій
+        return userRepository.getAll();
     }
 
     // Приватні методи
@@ -130,7 +129,6 @@ public class UserService {
             throw new IllegalArgumentException("❌ Невірна довжина номера (12-15 символів).");
         }
     }
-    // Додай це в UserService.java
 
     public void deleteUser(String username) {
         // 1. ЗАХИСТ: Не можна видалити головного адміна
@@ -145,5 +143,30 @@ public class UserService {
             throw new IllegalArgumentException(
                     "❌ Користувача з логіном '" + username + "' не знайдено.");
         }
+    }
+
+    public void changeUserRole(String username, Role newRole) {
+        // 1. Захист: Не можна чіпати головного адміна
+        if (username.equalsIgnoreCase("admin")) {
+            throw new IllegalArgumentException(
+                    "⛔ Не можна змінювати роль головного адміністратора!");
+        }
+
+        // 2. Шукаємо користувача
+        Optional<User> userOpt = userRepository.getById(username);
+        if (userOpt.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "❌ Користувача з логіном '" + username + "' не знайдено.");
+        }
+
+        // 3. Міняємо роль і зберігаємо
+        User user = userOpt.get();
+
+        if (user.getRole() == newRole) {
+            throw new IllegalArgumentException("⚠️ Користувач вже має цю роль!");
+        }
+
+        user.setRole(newRole);
+        userRepository.update(user);
     }
 }

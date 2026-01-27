@@ -8,9 +8,8 @@ public class UserUpdateDto {
     private final String password;
 
     public UserUpdateDto(String fullName, String phone, String address, String password) {
-        // Залишаємо базову перевірку, але вона вже не буде заважати основному процесу
         if (password != null && !password.isEmpty()
-                && password.length() < 6) { // ⬅️ Було 3, стало 6
+                && password.length() < 6) {
             throw new IllegalArgumentException(
                     "❌ Новий пароль надто короткий (мінімум 6 символів)!");
         }
