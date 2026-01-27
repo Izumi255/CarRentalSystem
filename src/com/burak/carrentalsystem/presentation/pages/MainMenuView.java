@@ -72,12 +72,16 @@ public class MainMenuView {
                     }
                     break;
                 case "5":
+
                     if (isAdmin()) {
-                        ConsoleColors.print(ConsoleColors.YELLOW,
-                                "🚧 Цей функціонал ще в розробці...");
-                        pressEnterToContinue();
+                        new UserListView().show();
                     } else {
-                        showAccessDenied();
+
+                        System.out.println(ConsoleColors.RED + "⛔ Доступ заборонено!");
+                        try {
+                            Thread.sleep(1500);
+                        } catch (InterruptedException ignored) {
+                        }
                     }
                     break;
                 case "0":
@@ -98,7 +102,6 @@ public class MainMenuView {
             }
         }
     }
-
 
     private boolean isAdmin() {
         return user.getRole() == Role.ADMIN;

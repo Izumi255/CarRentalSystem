@@ -8,13 +8,11 @@ public class UserUpdateDto {
     private final String password;
 
     public UserUpdateDto(String fullName, String phone, String address, String password) {
-        if (fullName != null && fullName.trim().length() < 2) {
-            throw new IllegalArgumentException("❌ Ім'я надто коротке!");
-        }
-
-        if (password != null && !password.isEmpty() && password.length() < 3) {
+        // Залишаємо базову перевірку, але вона вже не буде заважати основному процесу
+        if (password != null && !password.isEmpty()
+                && password.length() < 6) { // ⬅️ Було 3, стало 6
             throw new IllegalArgumentException(
-                    "❌ Новий пароль надто короткий (мінімум 3 символи)!");
+                    "❌ Новий пароль надто короткий (мінімум 6 символів)!");
         }
 
         this.fullName = fullName;
@@ -23,7 +21,6 @@ public class UserUpdateDto {
         this.password = password;
     }
 
-    // Геттери
     public String getFullName() {
         return fullName;
     }

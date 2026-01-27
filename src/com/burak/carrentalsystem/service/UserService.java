@@ -8,6 +8,7 @@ import com.burak.carrentalsystem.repository.CrudRepository;
 import com.burak.carrentalsystem.repository.FileUserRepository;
 import com.password4j.Password;
 
+import java.util.List; // ✅ ВИКОРИСТОВУЄМО LIST, ЯК У РЕПОЗИТОРІЇ
 import java.util.Optional;
 
 public class UserService {
@@ -17,31 +18,49 @@ public class UserService {
 
     public UserService() {
         this.userRepository = new FileUserRepository();
-
         this.notificationService = new EmailNotificationService();
     }
 
+    // 1. Валідація даних (без Regex для email)
+    public void validateUserData(String username, String email, String phone, String address) {
+        if (userRepository.getById(username).isPresent()) {
+            throw new IllegalArgumentException(
+                    "❌ Користувач з логіном '" + username + "' вже існує!");
+        }
+
+        String cleanEmail = (email != null) ? email.trim() : "";
+        boolean emailExists = userRepository.getAll().stream()
+                .anyMatch(u -> u.getEmail().equalsIgnoreCase(cleanEmail));
+
+        if (emailExists) {
+            throw new IllegalArgumentException("❌ Email '" + cleanEmail + "' вже зареєстрований!");
+        }
+
+        validatePhone(phone);
+
+        if (address == null || address.trim().length() < 3) {
+            throw new IllegalArgumentException("❌ Адреса занадто коротка!");
+        }
+    }
+
+    // 2. Пошук юзера
     public Optional<User> findByUsername(String username) {
         return userRepository.getById(username);
     }
 
+    // 3. Відправка коду
     public void sendVerificationCode(String email, String code) {
-        System.out.println("📧 Відправка коду на: " + email);
         notificationService.sendNotification(
                 email,
                 "🔐 Код підтвердження CarRental",
-                "Ваш код для реєстрації: " + code + "\nНікому не повідомляйте його."
+                "Ваш код: " + code
         );
     }
 
+    // 4. Реєстрація
     public void registerUser(UserStoreDto userDto) {
-        System.out.println("ℹ️ Спроба реєстрації користувача: " + userDto.getUsername());
-
-        Optional<User> existingUser = userRepository.getById(userDto.getUsername());
-        if (existingUser.isPresent()) {
-            throw new IllegalArgumentException(
-                    "❌ Помилка: Користувач з логіном '" + userDto.getUsername() + "' вже існує!");
-        }
+        validateUserData(userDto.getUsername(), userDto.getEmail(), userDto.getPhone(),
+                userDto.getAddress());
 
         String hashedPassword = Password.hash(userDto.getPassword()).withBcrypt().getResult();
 
@@ -55,61 +74,76 @@ public class UserService {
                 Role.CUSTOMER
         );
 
-        // Збереження в базу
         userRepository.add(newUser);
-        System.out.println("✅ Користувач успішно збережений у базі.");
-
     }
 
+    // 5. Авторизація
     public User login(String username, String rawPassword) {
         Optional<User> userOpt = userRepository.getById(username);
-
         if (userOpt.isEmpty()) {
-            throw new IllegalArgumentException("❌ Невірний логін або пароль!");
+            throw new IllegalArgumentException("❌ Невірний логін!");
         }
-
         User user = userOpt.get();
-
-        boolean isPasswordCorrect = Password.check(rawPassword, user.getPassword()).withBcrypt();
-
-        if (isPasswordCorrect) {
-            System.out.println("🔓 Вхід успішний: " + user.getUsername());
+        if (Password.check(rawPassword, user.getPassword()).withBcrypt()) {
             return user;
         } else {
-            throw new IllegalArgumentException("❌ Невірний логін або пароль!");
+            throw new IllegalArgumentException("❌ Невірний пароль!");
         }
     }
 
+    // 6. Оновлення
     public void updateUser(String username, UserUpdateDto updateDto) {
         Optional<User> userOpt = userRepository.getById(username);
         if (userOpt.isEmpty()) {
             throw new IllegalArgumentException("❌ Користувача не знайдено!");
         }
+
         User user = userOpt.get();
-
-        System.out.println("ℹ️ Оновлення профілю для: " + username);
-
         if (updateDto.getFullName() != null) {
             user.setFullName(updateDto.getFullName());
         }
         if (updateDto.getPhone() != null) {
+            validatePhone(updateDto.getPhone());
             user.setPhone(updateDto.getPhone());
         }
         if (updateDto.getAddress() != null) {
             user.setAddress(updateDto.getAddress());
         }
-
         if (updateDto.getPassword() != null && !updateDto.getPassword().isEmpty()) {
-            String newHash = Password.hash(updateDto.getPassword()).withBcrypt().getResult();
-            user.setPassword(newHash);
-            System.out.println("🔐 Пароль успішно змінено.");
+            user.setPassword(Password.hash(updateDto.getPassword()).withBcrypt().getResult());
         }
-
         userRepository.add(user);
-        System.out.println("✅ Дані профілю оновлено!");
     }
 
-    public java.util.Collection<User> getAllUsers() {
-        return userRepository.getAll();
+    // ✅ 7. ОТРИМАТИ ВСІХ (Узгоджено з репозиторієм)
+    public List<User> getAllUsers() {
+        return userRepository.getAll(); // Просто повертаємо те, що дає репозиторій
+    }
+
+    // Приватні методи
+    private void validatePhone(String phone) {
+        if (phone == null || !phone.trim().startsWith("+421")) {
+            throw new IllegalArgumentException("❌ Телефон має починатися з +421!");
+        }
+        String cleanPhone = phone.trim();
+        if (cleanPhone.length() < 12 || cleanPhone.length() > 15) {
+            throw new IllegalArgumentException("❌ Невірна довжина номера (12-15 символів).");
+        }
+    }
+    // Додай це в UserService.java
+
+    public void deleteUser(String username) {
+        // 1. ЗАХИСТ: Не можна видалити головного адміна
+        if (username.equalsIgnoreCase("admin")) {
+            throw new IllegalArgumentException("⛔ Не можна видалити головного адміністратора!");
+        }
+
+        // 2. Викликаємо репозиторій
+        boolean isDeleted = userRepository.delete(username);
+
+        if (!isDeleted) {
+            throw new IllegalArgumentException(
+                    "❌ Користувача з логіном '" + username + "' не знайдено.");
+        }
     }
 }

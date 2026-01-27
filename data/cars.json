@@ -4,7 +4,7 @@
     "brand": "Mercedes",
     "model": "Civic",
     "pricePerHour": 35.9,
-    "isAvailable": true,
-    "rentEndTime": 0
+    "isAvailable": false,
+    "rentEndTime": 1769530646706
   }
 ]
