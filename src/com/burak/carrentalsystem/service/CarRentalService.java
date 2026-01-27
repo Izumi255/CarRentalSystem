@@ -1,3 +1,4 @@
+/*
 package com.burak.carrentalsystem.service;
 
 import com.burak.carrentalsystem.model.*;
@@ -70,7 +71,6 @@ public class CarRentalService {
             System.out.println("👥 Користувачів додано в users.json");
         }
 
-        // 4. Генеруємо Оренди (для тесту)
         if (rentalRepository.getAll().isEmpty()) {
             List<User> allUsers = userRepository.getAll();
             List<Car> allCars = carRepository.getAll();
@@ -118,4 +118,4 @@ public class CarRentalService {
             System.out.println(rental);
         }
     }
-}
+}*/

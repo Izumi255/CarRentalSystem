@@ -24,8 +24,6 @@ public class FileRentalRepository implements CrudRepository<Rental> {
         loadFromFile();
     }
 
-    //CRUD
-
     @Override
     public void add(Rental rental) {
         rentals.add(rental);
@@ -49,11 +47,9 @@ public class FileRentalRepository implements CrudRepository<Rental> {
 
     @Override
     public boolean delete(String id) {
-        // Якщо треба буде видалити історію
         return false;
     }
 
-    //СПЕЦИФІЧНИЙ ПОШУК
 
     public List<Rental> getRentalsByUser(String username) {
         return rentals.stream()

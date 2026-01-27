@@ -37,9 +37,6 @@ public class RegisterForm {
         System.out.println(ConsoleColors.CYAN + " Будь ласка, заповніть анкету нижче:\n"
                 + ConsoleColors.RESET);
 
-        // --- ВВЕДЕННЯ ДАНИХ (з вирівнюванням) ---
-        // Використовуємо String.format для рівних відступів
-
         System.out.print(ConsoleColors.GREEN_BOLD + "  " + ConsoleColors.USER_ICON + "  Логін:    "
                 + ConsoleColors.RESET + ConsoleColors.ARROW + " ");
         String username = scanner.nextLine();
@@ -103,7 +100,6 @@ public class RegisterForm {
             return null;
         }
 
-        // 🔥 2. РЕЄСТРАЦІЯ
         try {
             UserStoreDto userDto = new UserStoreDto(username, fullName, email, password, phone,
                     address);
@@ -126,7 +122,6 @@ public class RegisterForm {
         }
     }
 
-    // Допоміжний метод, щоб повідомлення про помилку не зникало миттєво
     private void pressEnterToContinue() {
         System.out.println(ConsoleColors.RESET + "\nНатисніть Enter, щоб продовжити...");
         scanner.nextLine();

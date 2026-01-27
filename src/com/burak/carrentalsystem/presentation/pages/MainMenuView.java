@@ -23,16 +23,13 @@ public class MainMenuView {
         while (true) {
             ConsoleColors.clearScreen();
 
-            // --- ВЕРХНЯ ПАНЕЛЬ КОРИСТУВАЧА ---
             printUserHeader();
 
             System.out.println(ConsoleColors.CYAN + " Оберіть дію:" + ConsoleColors.RESET);
 
-            // --- ЗАГАЛЬНЕ МЕНЮ ---
             System.out.println("  [1] " + ConsoleColors.CAR_ICON + "  Переглянути доступні авто");
             System.out.println("  [2] " + ConsoleColors.USER_ICON + "  Мій профіль");
 
-            // --- АДМІН ПАНЕЛЬ (Тільки якщо адмін) ---
             if (user.getRole() == Role.ADMIN) {
                 System.out.println(ConsoleColors.PURPLE + "\n  ─── 🛠 АДМІНІСТРУВАННЯ ───"
                         + ConsoleColors.RESET);
@@ -85,7 +82,6 @@ public class MainMenuView {
                     break;
                 case "0":
                     SessionManager.clearSession();
-                    // ✅ ВИПРАВЛЕНО: getFullName() замість getFirstName()
                     ConsoleColors.print(ConsoleColors.BLUE,
                             "\n👋 До побачення, " + user.getFullName() + "!");
                     try {
@@ -103,7 +99,6 @@ public class MainMenuView {
         }
     }
 
-    // --- ДОПОМІЖНІ МЕТОДИ ---
 
     private boolean isAdmin() {
         return user.getRole() == Role.ADMIN;
@@ -127,7 +122,6 @@ public class MainMenuView {
                 ConsoleColors.BOX_TOP_LEFT + "═════════════════════════════════════════════"
                 + ConsoleColors.BOX_TOP_RIGHT + ConsoleColors.RESET);
 
-        // Рядок 1: Ім'я (Зменшили до 22)
         System.out.println(
                 ConsoleColors.BLUE_BOLD + ConsoleColors.BOX_VERTICAL + ConsoleColors.RESET +
                         "  👤 Ви увійшли як: " + ConsoleColors.WHITE_BOLD + user.getFullName()
@@ -135,14 +129,12 @@ public class MainMenuView {
                         padRight(25 - user.getFullName().length()) + ConsoleColors.BLUE_BOLD
                         + ConsoleColors.BOX_VERTICAL + ConsoleColors.RESET);
 
-        // Рядок 2: Роль (Зменшили до 32)
         System.out.println(
                 ConsoleColors.BLUE_BOLD + ConsoleColors.BOX_VERTICAL + ConsoleColors.RESET +
                         "  🛡️ Роль: " + roleColor + roleName + ConsoleColors.RESET +
                         padRight(34 - roleName.length()) + ConsoleColors.BLUE_BOLD
                         + ConsoleColors.BOX_VERTICAL + ConsoleColors.RESET);
 
-        // Нижня рамка
         System.out.println(ConsoleColors.BLUE_BOLD +
                 ConsoleColors.BOX_BOTTOM_LEFT + "═════════════════════════════════════════════"
                 + ConsoleColors.BOX_BOTTOM_RIGHT + ConsoleColors.RESET);

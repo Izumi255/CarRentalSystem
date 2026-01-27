@@ -19,7 +19,6 @@ public class LoginForm {
     public User show() {
         ConsoleColors.clearScreen();
 
-        // --- ШАПКА ФОРМИ ---
         System.out.println(ConsoleColors.CYAN_BOLD +
                 ConsoleColors.BOX_TOP_LEFT + "══════════════════════════════════════════════"
                 + ConsoleColors.BOX_TOP_RIGHT);
@@ -53,7 +52,6 @@ public class LoginForm {
 
             User user = userService.login(username, password);
 
-            // ✅ ВИПРАВЛЕНО: getFullName() замість getFirstName()
             ConsoleColors.print(ConsoleColors.GREEN_BOLD,
                     "\n  " + ConsoleColors.CHECK_ICON + "  Успішний вхід! Ласкаво просимо, "
                             + user.getFullName() + ".");

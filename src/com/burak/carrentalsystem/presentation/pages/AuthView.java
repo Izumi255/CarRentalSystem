@@ -20,20 +20,20 @@ public class AuthView {
     }
 
     public void show() {
-        // 🔥 ПЕРЕВІРКА СЕСІЇ (Якщо юзер вже був, заходимо автоматично)
+
         User savedUser = SessionManager.restoreSession(userService);
         if (savedUser != null) {
             ConsoleColors.clearScreen();
             ConsoleColors.print(ConsoleColors.GREEN_BOLD,
                     "\n " + ConsoleColors.CHECK_ICON + " З поверненням, " + savedUser.getFullName()
                             + "!");
-            // Невелика пауза для ефекту (опціонально)
+
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
             }
 
-            new MainMenuView(savedUser).show(); // Одразу в меню
+            new MainMenuView(savedUser).show();
         }
 
         // Якщо сесії немає — показуємо гарне меню
@@ -45,14 +45,12 @@ public class AuthView {
                     + ConsoleColors.BOX_TOP_RIGHT +
                     ConsoleColors.RESET);
 
-            // Текст заголовку з іконками машин
             System.out.println(ConsoleColors.BLUE_BOLD +
                     ConsoleColors.BOX_VERTICAL + "     " + ConsoleColors.CAR_ICON
                     + "   ВІТАЄМО В CAR RENTAL SYSTEM   " + ConsoleColors.CAR_ICON + "     "
                     + ConsoleColors.BOX_VERTICAL +
                     ConsoleColors.RESET);
 
-            // Нижня рамка шапки
             System.out.println(ConsoleColors.BLUE_BOLD +
                     ConsoleColors.BOX_BOTTOM_LEFT + "══════════════════════════════════════════════"
                     + ConsoleColors.BOX_BOTTOM_RIGHT +
@@ -60,19 +58,18 @@ public class AuthView {
 
             System.out.println(); // Відступ
 
-            // --- МЕНЮ (MENU OPTIONS) ---
             ConsoleColors.print(ConsoleColors.CYAN,
                     "    [1] " + ConsoleColors.KEY_ICON + "  Вхід у систему");
             ConsoleColors.print(ConsoleColors.CYAN,
                     "    [2] " + ConsoleColors.USER_ICON + "  Створити акаунт");
 
             System.out.println(ConsoleColors.BLUE + "    ──────────────────────────────────────────"
-                    + ConsoleColors.RESET); // Розділювач
+                    + ConsoleColors.RESET);
 
             ConsoleColors.print(ConsoleColors.RED, "    [0] " + ConsoleColors.BOX_TOP_RIGHT
-                    + "  Вихід з програми"); // Використав куточок як іконку виходу
+                    + "  Вихід з програми");
 
-            System.out.println(); // Відступ перед вводом
+            System.out.println();
             ConsoleColors.printInline(ConsoleColors.YELLOW_BOLD,
                     " " + ConsoleColors.ARROW + " Ваш вибір > ");
 
@@ -98,13 +95,12 @@ public class AuthView {
                     System.exit(0);
                     break;
                 default:
-                    // Гарне повідомлення про помилку
                     ConsoleColors.print(ConsoleColors.RED_BOLD, "\n " + ConsoleColors.ERROR_ICON
                             + " Невідома команда, спробуйте ще раз.");
                     try {
                         Thread.sleep(800);
                     } catch (InterruptedException e) {
-                    } // Пауза щоб прочитати помилку
+                    }
             }
         }
     }

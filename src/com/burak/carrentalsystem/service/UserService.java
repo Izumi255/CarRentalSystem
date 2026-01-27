@@ -17,16 +17,14 @@ public class UserService {
 
     public UserService() {
         this.userRepository = new FileUserRepository();
-        // Використовуємо наш сервіс пошти (який читає .env)
+
         this.notificationService = new EmailNotificationService();
     }
 
-    // ✅ НОВЕ: Метод для пошуку юзера (потрібен для SessionManager)
     public Optional<User> findByUsername(String username) {
         return userRepository.getById(username);
     }
 
-    // ✅ НОВЕ: Метод для відправки коду підтвердження (викликається з форми)
     public void sendVerificationCode(String email, String code) {
         System.out.println("📧 Відправка коду на: " + email);
         notificationService.sendNotification(
@@ -39,7 +37,6 @@ public class UserService {
     public void registerUser(UserStoreDto userDto) {
         System.out.println("ℹ️ Спроба реєстрації користувача: " + userDto.getUsername());
 
-        // Перевірка логіна
         Optional<User> existingUser = userRepository.getById(userDto.getUsername());
         if (existingUser.isPresent()) {
             throw new IllegalArgumentException(
@@ -48,7 +45,6 @@ public class UserService {
 
         String hashedPassword = Password.hash(userDto.getPassword()).withBcrypt().getResult();
 
-        // Створення користувача
         User newUser = new User(
                 userDto.getUsername(),
                 userDto.getFullName(),
@@ -63,8 +59,6 @@ public class UserService {
         userRepository.add(newUser);
         System.out.println("✅ Користувач успішно збережений у базі.");
 
-        // ⚠️ ЗМІНА: Ми прибрали звідси відправку вітального листа,
-        // бо користувач вже отримав код підтвердження перед цим.
     }
 
     public User login(String username, String rawPassword) {
@@ -95,7 +89,6 @@ public class UserService {
 
         System.out.println("ℹ️ Оновлення профілю для: " + username);
 
-        // Оновлюємо поля, тільки якщо вони не null (прийшли в DTO)
         if (updateDto.getFullName() != null) {
             user.setFullName(updateDto.getFullName());
         }
@@ -106,7 +99,6 @@ public class UserService {
             user.setAddress(updateDto.getAddress());
         }
 
-        // Оновлюємо пароль ТІЛЬКИ якщо він був переданий (не null і не пустий)
         if (updateDto.getPassword() != null && !updateDto.getPassword().isEmpty()) {
             String newHash = Password.hash(updateDto.getPassword()).withBcrypt().getResult();
             user.setPassword(newHash);
