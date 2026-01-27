@@ -21,87 +21,141 @@ public class CarListView {
     public void show() {
         while (true) {
             ConsoleColors.clearScreen();
-
-            // ⚠️ ВАЖЛИВО: Перетворюємо Collection в List, щоб мати індекси (0, 1, 2...)
             List<Car> carList = new ArrayList<>(carService.getAllCars());
 
-            ConsoleColors.print(ConsoleColors.CYAN, "\n🚗 --- ДОСТУПНІ АВТОМОБІЛІ ---");
+            // --- ШАПКА ---
+            System.out.println(ConsoleColors.CYAN_BOLD +
+                    ConsoleColors.BOX_TOP_LEFT
+                    + "════════════════════════════════════════════════════════════"
+                    + ConsoleColors.BOX_TOP_RIGHT);
+            System.out.println(ConsoleColors.BOX_VERTICAL
+                    + "                🚗 ПАРК АВТОМОБІЛІВ КОМПАНІЇ              "
+                    + ConsoleColors.BOX_VERTICAL);
+            System.out.println(ConsoleColors.BOX_BOTTOM_LEFT
+                    + "════════════════════════════════════════════════════════════"
+                    + ConsoleColors.BOX_BOTTOM_RIGHT + ConsoleColors.RESET);
 
             if (carList.isEmpty()) {
-                ConsoleColors.print(ConsoleColors.YELLOW,
-                        "😕 Список порожній. Адмін ще не додав авто.");
-                System.out.println("Натисніть Enter, щоб вийти...");
-                scanner.nextLine();
+                System.out.println(ConsoleColors.YELLOW + "\n  😕 Список порожній. Машин ще немає.");
+                pause();
                 return;
             }
 
-            System.out.println(
-                    "-----------------------------------------------------------------------------");
-            // Замість ID пишемо "№" (Номер)
-            System.out.printf("%-5s %-15s %-15s %-15s %-10s%n", "№", "БРЕНД", "МОДЕЛЬ", "ЦІНА/ГОД",
-                    "СТАТУС");
-            System.out.println(
-                    "-----------------------------------------------------------------------------");
+            // --- ШАПКА ТАБЛИЦІ (Додана колонка "ЧАС") ---
+            System.out.println();
+            System.out.printf(ConsoleColors.BLUE_BOLD + "  %-4s  %-20s  %-10s  %-12s  %s%n"
+                            + ConsoleColors.RESET,
+                    "#", "🚘 АВТОМОБІЛЬ", "💰 ЦІНА", "📊 СТАТУС", "⏳ ЧАС");
+            System.out.println(ConsoleColors.BLUE
+                    + "  ────  ────────────────────  ──────────  ────────────  ────────"
+                    + ConsoleColors.RESET);
 
-            // Виводимо список з порядковими номерами (i + 1)
             for (int i = 0; i < carList.size(); i++) {
                 Car car = carList.get(i);
+                String fullName = car.getBrand() + " " + car.getModel();
+                if (fullName.length() > 18) {
+                    fullName = fullName.substring(0, 17) + "…";
+                }
 
-                String statusColor = car.isAvailable() ? ConsoleColors.GREEN : ConsoleColors.RED;
-                String statusText = car.isAvailable() ? "ВІЛЬНО" : "ЗАЙНЯТО";
+                String status;
+                String timeRemaining = "---";
 
-                // Тут ми показуємо (i + 1), тобто 1, 2, 3... замість довгого ID
-                System.out.printf("%-5d %-15s %-15s %-15s %s%s%s%n",
-                        (i + 1),
-                        car.getBrand(),
-                        car.getModel(),
-                        String.format("%.2f €", car.getPricePerHour()),
-                        statusColor, statusText, ConsoleColors.RESET
-                );
+                if (car.isAvailable()) {
+                    status = ConsoleColors.GREEN_BOLD + "ВІЛЬНО   " + ConsoleColors.RESET;
+                } else {
+                    status = ConsoleColors.RED_BOLD + "ЗАЙНЯТО  " + ConsoleColors.RESET;
+
+                    // Розрахунок залишку часу в хвилинах
+                    long diff = car.getRentEndTime() - System.currentTimeMillis();
+                    if (diff > 0) {
+                        long mins = (diff / 60000) + 1; // Округлюємо в більшу сторону
+                        timeRemaining = mins + " хв.";
+                    }
+                }
+
+                String price = String.format("%.2f €", car.getPricePerHour());
+
+                System.out.printf("  [%d]   %-20s  %-10s  %-12s  %s%n",
+                        (i + 1), fullName, price, status, timeRemaining);
             }
-            System.out.println(
-                    "-----------------------------------------------------------------------------");
 
-            System.out.println("\nВведіть НОМЕР авто для оренди (наприклад 1) або '0' для виходу:");
-            System.out.print("Ваш вибір > ");
+            System.out.println(ConsoleColors.BLUE
+                    + "  ──────────────────────────────────────────────────────────────"
+                    + ConsoleColors.RESET);
 
-            String input = scanner.nextLine();
+            // --- МЕНЮ ---
+            System.out.println(ConsoleColors.CYAN + "\n Введіть номер авто для оренди.");
+            System.out.println(ConsoleColors.RED + " [0] Повернутися назад");
 
+            System.out.println();
+            ConsoleColors.printInline(ConsoleColors.YELLOW_BOLD,
+                    " " + ConsoleColors.ARROW + " Ваш вибір > ");
+
+            String input = scanner.nextLine().trim();
             if (input.equals("0")) {
                 return;
             }
 
             try {
-                int choice = Integer.parseInt(input); // Перетворюємо текст в число
-                int index = choice - 1; // В програмуванні індекси з 0, а у людей з 1
-
+                int index = Integer.parseInt(input) - 1;
                 if (index >= 0 && index < carList.size()) {
-                    // 🔥 МАГІЯ: Дістаємо справжню машину за простим номером
-                    Car selectedCar = carList.get(index);
-
-                    // Викликаємо оренду, передаючи справжній ID
-                    boolean success = carService.rentCar(selectedCar.getId());
-
-                    if (success) {
-                        System.out.println("Натисніть Enter, щоб продовжити...");
-                        scanner.nextLine();
-                    } else {
-                        Thread.sleep(2000); // Пауза, щоб прочитати помилку
-                    }
+                    processRent(carList.get(index));
                 } else {
-                    ConsoleColors.print(ConsoleColors.RED, "❌ Невірний номер! Такої машини немає.");
-                    Thread.sleep(1500);
+                    ConsoleColors.print(ConsoleColors.RED_BOLD,
+                            "\n " + ConsoleColors.ERROR_ICON + " Невірний номер.");
+                    pause();
                 }
-
             } catch (NumberFormatException e) {
-                ConsoleColors.print(ConsoleColors.RED, "❌ Введіть число!");
-                try {
-                    Thread.sleep(1500);
-                } catch (InterruptedException ex) {
+                if (!input.isEmpty()) {
+                    ConsoleColors.print(ConsoleColors.RED_BOLD,
+                            "\n " + ConsoleColors.ERROR_ICON + " Введіть число!");
+                    pause();
                 }
-            } catch (InterruptedException e) {
-                // ігноруємо
             }
         }
+    }
+
+    private void processRent(Car car) {
+        if (!car.isAvailable()) {
+            ConsoleColors.print(ConsoleColors.RED_BOLD,
+                    "\n " + ConsoleColors.ERROR_ICON + " Це авто вже в оренді.");
+            pause();
+            return;
+        }
+
+        System.out.println(ConsoleColors.CYAN + "\n ⏱ Оформлення оренди:");
+        System.out.print(ConsoleColors.GREEN_BOLD + "  🕒 Тривалість (хв): " + ConsoleColors.RESET
+                + ConsoleColors.ARROW + " ");
+
+        int minutes = 60;
+        try {
+            String val = scanner.nextLine().trim();
+            if (!val.isEmpty()) {
+                minutes = Integer.parseInt(val);
+            }
+        } catch (NumberFormatException e) {
+            System.out.println(ConsoleColors.YELLOW + "  ⚠️ Некоректно. Виставлено 60 хв.");
+        }
+
+        System.out.println(ConsoleColors.YELLOW + " ⏳ Транзакція...");
+        try {
+            Thread.sleep(700);
+        } catch (Exception e) {
+        }
+
+        if (carService.rentCar(car.getId(), minutes)) {
+            ConsoleColors.print(ConsoleColors.GREEN_BOLD,
+                    "\n " + ConsoleColors.CHECK_ICON + " Успішно! Оренда на " + minutes
+                            + " хв. активована.");
+        } else {
+            ConsoleColors.print(ConsoleColors.RED_BOLD,
+                    "\n " + ConsoleColors.ERROR_ICON + " Помилка оренди.");
+        }
+        pause();
+    }
+
+    private void pause() {
+        System.out.println(ConsoleColors.RESET + "\nНатисніть Enter...");
+        scanner.nextLine();
     }
 }

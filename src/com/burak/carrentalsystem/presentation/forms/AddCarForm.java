@@ -14,7 +14,7 @@ public class AddCarForm {
     private final Scanner scanner;
     private final Random random;
 
-    // Масиви для генерації фейкових даних (DataFaker своїми руками)
+    // Масиви для генерації фейкових даних
     private final String[] fakeBrands = {"BMW", "Mercedes", "Audi", "Toyota", "Tesla", "Ford",
             "Honda", "Volkswagen"};
     private final String[] fakeModels = {"X5", "C-Class", "A6", "Camry", "Model S", "Mustang",
@@ -27,56 +27,101 @@ public class AddCarForm {
     }
 
     public void show() {
-        ConsoleColors.print(ConsoleColors.CYAN, "\n➕ --- ДОДАВАННЯ НОВОГО АВТО ---");
+        ConsoleColors.clearScreen();
+
+        // --- ШАПКА ---
+        System.out.println(ConsoleColors.CYAN_BOLD +
+                ConsoleColors.BOX_TOP_LEFT + "══════════════════════════════════════════════"
+                + ConsoleColors.BOX_TOP_RIGHT);
         System.out.println(
-                "(💡 Порада: Натисніть Enter без вводу, щоб згенерувати дані автоматично)");
+                ConsoleColors.BOX_VERTICAL + "          ➕ ДОДАВАННЯ НОВОГО АВТО            "
+                        + ConsoleColors.BOX_VERTICAL);
+        System.out.println(
+                ConsoleColors.BOX_BOTTOM_LEFT + "══════════════════════════════════════════════"
+                        + ConsoleColors.BOX_BOTTOM_RIGHT +
+                        ConsoleColors.RESET);
+
+        System.out.println(ConsoleColors.YELLOW
+                + " 💡 Порада: Натисніть [Enter] без вводу, щоб згенерувати дані автоматично 🎲\n"
+                + ConsoleColors.RESET);
 
         // 1. МАРКА (BRAND)
-        System.out.print("Марка (Brand): ");
+        System.out.print(ConsoleColors.GREEN_BOLD + "  🚘  Марка (Brand): " + ConsoleColors.RESET
+                + ConsoleColors.ARROW + " ");
         String brand = scanner.nextLine().trim();
 
         if (brand.isEmpty()) {
-            brand = fakeBrands[random.nextInt(fakeBrands.length)]; // Випадкова марка
-            ConsoleColors.print(ConsoleColors.PURPLE, "🎲 Авто-генерація: " + brand);
+            brand = fakeBrands[random.nextInt(fakeBrands.length)];
+            System.out.println(ConsoleColors.PURPLE_BOLD + "     🎲 Авто-вибір: " + brand
+                    + ConsoleColors.RESET);
         }
 
         // 2. МОДЕЛЬ (MODEL)
-        System.out.print("Модель (Model): ");
+        System.out.print(ConsoleColors.GREEN_BOLD + "  🏎️   Модель (Model): " + ConsoleColors.RESET
+                + ConsoleColors.ARROW + " ");
         String model = scanner.nextLine().trim();
 
         if (model.isEmpty()) {
-            model = fakeModels[random.nextInt(fakeModels.length)]; // Випадкова модель
-            ConsoleColors.print(ConsoleColors.PURPLE, "🎲 Авто-генерація: " + model);
+            model = fakeModels[random.nextInt(fakeModels.length)];
+            System.out.println(ConsoleColors.PURPLE_BOLD + "     🎲 Авто-вибір: " + model
+                    + ConsoleColors.RESET);
         }
 
         // 3. ЦІНА (PRICE)
-        System.out.print("Ціна за годину (€): ");
+        System.out.print(ConsoleColors.GREEN_BOLD + "  💰  Ціна (€/год):  " + ConsoleColors.RESET
+                + ConsoleColors.ARROW + " ");
         String priceInput = scanner.nextLine().trim();
         double price;
 
         if (priceInput.isEmpty()) {
-            // Генеруємо ціну від 10.0 до 100.0
             price = 10 + (90 * random.nextDouble());
-            // Округляємо до 2 знаків
             price = Math.round(price * 100.0) / 100.0;
-            ConsoleColors.print(ConsoleColors.PURPLE, "🎲 Авто-генерація: " + price + " €");
+            System.out.println(
+                    ConsoleColors.PURPLE_BOLD + "     🎲 Згенерована ціна: " + price + " €"
+                            + ConsoleColors.RESET);
         } else {
             try {
                 price = Double.parseDouble(priceInput);
             } catch (NumberFormatException e) {
-                ConsoleColors.print(ConsoleColors.RED, "❌ Ціна має бути числом! Скасовано.");
+                ConsoleColors.print(ConsoleColors.RED_BOLD,
+                        "\n  " + ConsoleColors.ERROR_ICON + " Помилка: Ціна має бути числом!");
+                pressEnterToContinue();
                 return;
             }
         }
+
+        System.out.println(ConsoleColors.CYAN + "  ──────────────────────────────────────────"
+                + ConsoleColors.RESET);
 
         // Створення авто
         Car newCar = new Car(UUID.randomUUID().toString(), brand, model, price);
 
         try {
+            System.out.println(ConsoleColors.YELLOW + "  ⏳ Збереження в базу...");
+            Thread.sleep(800);
+
             carService.addCar(newCar);
-            // Тут повідомлення про успіх вже є в сервісі, але можна продублювати для краси
+
+            // --- КАРТКА РЕЗУЛЬТАТУ ---
+            System.out.println(ConsoleColors.GREEN_BOLD + "\n  " + ConsoleColors.CHECK_ICON
+                    + "  АВТОМОБІЛЬ УСПІШНО ДОДАНО!");
+            System.out.println(ConsoleColors.GREEN + "  ╔══════════════════════════════════╗");
+            System.out.printf("  ║ %-32s ║\n", "🚘 " + brand + " " + model);
+            System.out.printf("  ║ %-32s ║\n", "💰 " + price + " € / година");
+            System.out.println("  ╚══════════════════════════════════╝" + ConsoleColors.RESET);
+
+            pressEnterToContinue();
+
         } catch (Exception e) {
-            ConsoleColors.print(ConsoleColors.RED, "❌ Помилка: " + e.getMessage());
+            ConsoleColors.print(ConsoleColors.RED_BOLD,
+                    "\n  " + ConsoleColors.ERROR_ICON + " Помилка при збереженні: "
+                            + e.getMessage());
+            pressEnterToContinue();
         }
+    }
+
+    private void pressEnterToContinue() {
+        System.out.println(ConsoleColors.RESET + "\nНатисніть Enter, щоб продовжити...");
+        scanner.nextLine();
     }
 }

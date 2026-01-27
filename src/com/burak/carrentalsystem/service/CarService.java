@@ -6,10 +6,9 @@ import com.burak.carrentalsystem.repository.FileCarRepository;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList; // ✅ Додано
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class CarService {
 
@@ -19,83 +18,42 @@ public class CarService {
         this.carRepository = new FileCarRepository();
     }
 
-    // --- БІЗНЕС-ЛОГІКА ---
-
-    // ✅ НОВИЙ МЕТОД (Саме його шукає AddCarForm)
     public void addCar(Car car) {
-        // Тут ми просто зберігаємо вже створену машину
         carRepository.add(car);
         System.out.println("✅ Авто успішно додано: " + car.getBrand() + " " + car.getModel());
     }
 
-    // Старий метод (може залишитися для сумісності)
-    public void addCar(String brand, String model, double pricePerHour) {
-        if (pricePerHour <= 0) {
-            throw new IllegalArgumentException("❌ Помилка: Ціна оренди має бути більше 0!");
-        }
-        if (brand == null || brand.trim().isEmpty()) {
-            throw new IllegalArgumentException("❌ Помилка: Бренд не може бути пустим!");
-        }
-
-        String id = "CAR-" + (System.currentTimeMillis() % 100000);
-        Car newCar = new Car(id, brand, model,
-                pricePerHour); // Тут використовується твій конструктор
-
-        carRepository.add(newCar);
-        System.out.println("✅ Авто успішно додано: " + brand + " " + model);
-    }
-
-    // Отримати тільки вільні авто
-    public List<Car> getAvailableCars() {
-        // ⚠️ ВИПРАВЛЕННЯ: Repository повертає Collection, тому перетворюємо в List
-        Collection<Car> allCars = carRepository.getAll();
-
-        List<Car> available = allCars.stream()
-                .filter(Car::isAvailable)
-                .collect(Collectors.toList());
-
-        if (available.isEmpty()) {
-            System.out.println("ℹ️ На жаль, вільних машин зараз немає.");
-        }
-        return available;
-    }
-
-    // Отримати всі авто
+    // Отримати всі авто (з АВТОМАТИЧНОЮ перевіркою часу)
     public List<Car> getAllCars() {
-        // ⚠️ ВИПРАВЛЕННЯ: Безпечне перетворення Collection -> List
+        checkRentalsExpiration(); // 🔥 Перевіряємо, чи не час звільняти авто
         return new ArrayList<>(carRepository.getAll());
     }
 
-    // Метод для експорту (ти його круто написав!)
-    public void exportCarsToExcel(String filename) {
-        System.out.println("📄 Починаю експорт даних у файл " + filename + "...");
+    // 🔥 МАГІЯ: Перевіряє таймери
+    private void checkRentalsExpiration() {
+        long currentTime = System.currentTimeMillis();
+        Collection<Car> allCars = carRepository.getAll();
 
-        Collection<Car> cars = carRepository.getAll();
+        boolean needUpdate = false;
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
-            writer.write("ID,Brand,Model,Price Per Hour,Is Available");
-            writer.newLine();
+        for (Car car : allCars) {
+            // Якщо авто зайняте І встановлено час закінчення І цей час уже минув
+            if (!car.isAvailable() && car.getRentEndTime() > 0
+                    && currentTime > car.getRentEndTime()) {
 
-            for (Car car : cars) {
-                String line = String.format("%s,%s,%s,%.2f,%s",
-                        car.getId(),
-                        car.getBrand(),
-                        car.getModel(),
-                        car.getPricePerHour(),
-                        car.isAvailable() ? "Yes" : "No"
-                );
-                writer.write(line);
-                writer.newLine();
+                car.setAvailable(true); // Звільняємо
+                car.setRentEndTime(0);  // Скидаємо таймер
+                carRepository.add(car); // Зберігаємо зміни в репозиторій
+                needUpdate = true;
             }
-            System.out.println("✅ Експорт успішний! Файл створено: " + filename);
-            System.out.println("ℹ️ Ви можете відкрити його в Excel.");
+        }
 
-        } catch (IOException e) {
-            System.err.println("❌ Помилка запису файлу: " + e.getMessage());
+        if (needUpdate) {
+
         }
     }
 
-    public boolean rentCar(String carId) {
+    public boolean rentCar(String carId, int minutes) {
         Car car = carRepository.getById(carId).orElse(null);
 
         if (car == null) {
@@ -108,11 +66,33 @@ public class CarService {
             return false;
         }
 
-        // Бронюємо авто
         car.setAvailable(false);
-        carRepository.add(car);
+
+        long endTime = System.currentTimeMillis() + (minutes * 60_000L);
+        car.setRentEndTime(endTime);
+
+        carRepository.add(car); // Зберігаємо оновлений статус у файл/пам'ять
 
         System.out.println("✅ Ви успішно орендували " + car.getBrand() + " " + car.getModel());
         return true;
+    }
+
+    public void exportCarsToExcel(String filename) {
+        System.out.println("📄 Починаю експорт даних у файл " + filename + "...");
+        Collection<Car> cars = carRepository.getAll();
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
+            writer.write("ID,Brand,Model,Price Per Hour,Is Available");
+            writer.newLine();
+            for (Car car : cars) {
+                String line = String.format("%s,%s,%s,%.2f,%s",
+                        car.getId(), car.getBrand(), car.getModel(), car.getPricePerHour(),
+                        car.isAvailable() ? "Yes" : "No");
+                writer.write(line);
+                writer.newLine();
+            }
+            System.out.println("✅ Експорт успішний! Файл створено: " + filename);
+        } catch (IOException e) {
+            System.err.println("❌ Помилка запису файлу: " + e.getMessage());
+        }
     }
 }

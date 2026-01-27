@@ -28,6 +28,19 @@ public class FileCarRepository implements CrudRepository<Car> {
 
     @Override
     public void add(Car car) {
+        // 🔥 ВИПРАВЛЕННЯ ТУТ: Логіка "Upsert" (Update or Insert)
+
+        // 1. Перевіряємо, чи є вже машина з таким ID у списку
+        for (int i = 0; i < cars.size(); i++) {
+            if (cars.get(i).getId().equals(car.getId())) {
+                // Якщо знайшли — просто ОНОВЛЮЄМО її (перезаписуємо)
+                cars.set(i, car);
+                saveToFile();
+                return; // Виходимо, щоб не додавати дублікат
+            }
+        }
+
+        // 2. Якщо цикл пройшов і такої машини немає — додаємо нову
         cars.add(car);
         saveToFile();
     }
@@ -46,6 +59,8 @@ public class FileCarRepository implements CrudRepository<Car> {
 
     @Override
     public void update(Car updatedCar) {
+        // Цей метод у тебе був правильний, але тепер add() робить те саме.
+        // Можна просто викликати add(updatedCar) або залишити як є.
         for (int i = 0; i < cars.size(); i++) {
             if (cars.get(i).getId().equals(updatedCar.getId())) {
                 cars.set(i, updatedCar);
@@ -64,9 +79,8 @@ public class FileCarRepository implements CrudRepository<Car> {
         return removed;
     }
 
-    // --- 🔍 ПОШУК І ФІЛЬТРАЦІЯ (Виправлено під твій Car.java) ---
+    // --- 🔍 ПОШУК І ФІЛЬТРАЦІЯ ---
 
-    // Знайти всі машини певного бренду (використовуємо getBrand)
     public List<Car> searchByBrand(String brand) {
         return cars.stream()
                 .filter(car -> car.getBrand().equalsIgnoreCase(brand))

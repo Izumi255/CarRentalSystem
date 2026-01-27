@@ -1,0 +1,10 @@
+[
+  {
+    "id": "5fcc4816-79e9-4e19-86ee-df40fdf4d6a4",
+    "brand": "Mercedes",
+    "model": "Civic",
+    "pricePerHour": 35.9,
+    "isAvailable": true,
+    "rentEndTime": 0
+  }
+]

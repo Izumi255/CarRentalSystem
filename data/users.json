@@ -1,0 +1,62 @@
+[
+  {
+    "id": "ebbe4f24-edaa-4e6f-b652-b67f819ae80d",
+    "username": "dima",
+    "fullName": "dima",
+    "password": "$2b$10$dJpvNpxN.LRdK/SAzEunDu98g1KUhm57zwaIKNvCDo9HIJr5jG1Nq",
+    "email": "dimaburak0811@gmail.com",
+    "phone": "123123",
+    "address": "123123",
+    "role": "ADMIN"
+  },
+  {
+    "id": "f326bc6c-f3b4-4c60-9a87-dadffdd5616a",
+    "username": "dmytro",
+    "fullName": "dima",
+    "password": "$2b$10$QTxmJbuokB4DtpZYJqltYuOmCgXC.wFSnTpXSwKg8VFQaGWwWqxga",
+    "email": "dimaburak0811@gmail.com",
+    "phone": "123123",
+    "address": "123123",
+    "role": "ADMIN"
+  },
+  {
+    "id": "52c5105b-24c9-456c-9111-0d49cd371812",
+    "username": "bmw",
+    "fullName": "dima",
+    "password": "$2b$10$nEk.GUg/Oa9v4ZBSCkJLSe3xnO7puDKlTkTOVEo0VUALaM3D4sYKq",
+    "email": "dimaburak0811@gmail.com",
+    "phone": "123123",
+    "address": "123123",
+    "role": "CUSTOMER"
+  },
+  {
+    "id": "31f9b48b-9ea9-4abc-9936-8ae62ff00c11",
+    "username": "voa",
+    "fullName": "vova",
+    "password": "$2b$10$YvoBYJiK/GXo6U1SOnAUouSWZjn33oMrvoPLhcDoGlUdCz2.LLYse",
+    "email": "dimaburak0811@gmail.com",
+    "phone": "123123",
+    "address": "123123",
+    "role": "CUSTOMER"
+  },
+  {
+    "id": "359571a7-c6c2-4873-aca4-10f1f651f5e9",
+    "username": "dmy",
+    "fullName": "dmy",
+    "password": "$2b$10$iLnXr2/iBq8S3EbFi57pNuRIeJMqjjXgzKE.2.41hUMv94eksu0iG",
+    "email": "dimaburak0811@gmail.com",
+    "phone": "123123",
+    "address": "123123",
+    "role": "CUSTOMER"
+  },
+  {
+    "id": "e380bbc0-4716-4158-b21a-a0bbbd65d937",
+    "username": "gfdgd",
+    "fullName": "digdfs",
+    "password": "$2b$10$l790rt6IXoaHagiWI5n4FeG9Bu3YeiLt51VlfFhjRBSMM.HW4ZIbC",
+    "email": "dimaburak0811@gmail.com",
+    "phone": "123123",
+    "address": "123123",
+    "role": "CUSTOMER"
+  }
+]

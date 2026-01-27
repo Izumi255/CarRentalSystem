@@ -19,63 +19,116 @@ public class RegisterForm {
         this.scanner = new Scanner(System.in);
     }
 
-    // Тепер метод повертає User (для авто-входу)
     public User show() {
-        ConsoleColors.print(ConsoleColors.CYAN, "\n📝 --- РЕЄСТРАЦІЯ ---");
+        ConsoleColors.clearScreen();
 
-        System.out.print("Логін: ");
+        // --- ШАПКА ФОРМИ ---
+        System.out.println(ConsoleColors.CYAN_BOLD +
+                ConsoleColors.BOX_TOP_LEFT + "══════════════════════════════════════════════"
+                + ConsoleColors.BOX_TOP_RIGHT);
+        System.out.println(
+                ConsoleColors.BOX_VERTICAL + "          📝 НОВА РЕЄСТРАЦІЯ КОРИСТУВАЧА      "
+                        + ConsoleColors.BOX_VERTICAL);
+        System.out.println(
+                ConsoleColors.BOX_BOTTOM_LEFT + "══════════════════════════════════════════════"
+                        + ConsoleColors.BOX_BOTTOM_RIGHT +
+                        ConsoleColors.RESET);
+
+        System.out.println(ConsoleColors.CYAN + " Будь ласка, заповніть анкету нижче:\n"
+                + ConsoleColors.RESET);
+
+        // --- ВВЕДЕННЯ ДАНИХ (з вирівнюванням) ---
+        // Використовуємо String.format для рівних відступів
+
+        System.out.print(ConsoleColors.GREEN_BOLD + "  " + ConsoleColors.USER_ICON + "  Логін:    "
+                + ConsoleColors.RESET + ConsoleColors.ARROW + " ");
         String username = scanner.nextLine();
-        // (Тут можна додати перевірку, чи вільний логін, перед заповненням анкети)
 
-        System.out.print("Ім'я: ");
+        System.out.print(ConsoleColors.GREEN_BOLD + "  📛  Ім'я:     " + ConsoleColors.RESET
+                + ConsoleColors.ARROW + " ");
         String fullName = scanner.nextLine();
-        System.out.print("Email: ");
+
+        System.out.print(ConsoleColors.GREEN_BOLD + "  📧  Email:    " + ConsoleColors.RESET
+                + ConsoleColors.ARROW + " ");
         String email = scanner.nextLine();
-        System.out.print("Пароль: ");
+
+        System.out.print(ConsoleColors.GREEN_BOLD + "  " + ConsoleColors.KEY_ICON + "  Пароль:   "
+                + ConsoleColors.RESET + ConsoleColors.ARROW + " ");
         String password = scanner.nextLine();
-        System.out.print("Телефон: ");
+
+        System.out.print(ConsoleColors.GREEN_BOLD + "  📱  Телефон:  " + ConsoleColors.RESET
+                + ConsoleColors.ARROW + " ");
         String phone = scanner.nextLine();
-        System.out.print("Адреса: ");
+
+        System.out.print(ConsoleColors.GREEN_BOLD + "  🏠  Адреса:   " + ConsoleColors.RESET
+                + ConsoleColors.ARROW + " ");
         String address = scanner.nextLine();
 
+        System.out.println(ConsoleColors.CYAN + "\n  ──────────────────────────────────────────"
+                + ConsoleColors.RESET);
+
         // 🔥 1. ВЕРИФІКАЦІЯ EMAIL
-        String code = String.valueOf(
-                new Random().nextInt(9000) + 1000); // Генеруємо 4 цифри (1000-9999)
-        System.out.println("⏳ Відправляємо код на " + email + "...");
+        String code = String.valueOf(new Random().nextInt(9000) + 1000);
+
+        System.out.println(ConsoleColors.YELLOW + "  ⏳  З'єднання з сервером...");
+        System.out.println(
+                "  📤  Відправка коду підтвердження на " + ConsoleColors.WHITE_BOLD + email + "..."
+                        + ConsoleColors.RESET);
 
         try {
-            userService.sendVerificationCode(email, code); // Відправка
+            userService.sendVerificationCode(email, code);
+            // Емуляція затримки для реалістичності
+            Thread.sleep(1000);
         } catch (Exception e) {
-            ConsoleColors.print(ConsoleColors.RED,
-                    "❌ Не вдалося відправити email. Реєстрація перервана.");
+            ConsoleColors.print(ConsoleColors.RED_BOLD,
+                    "\n  " + ConsoleColors.ERROR_ICON
+                            + " Помилка: Не вдалося відправити email. Реєстрація перервана.");
+            pressEnterToContinue();
             return null;
         }
 
-        System.out.print(ConsoleColors.YELLOW + "📩 Введіть код з листа: " + ConsoleColors.RESET);
+        System.out.println(
+                ConsoleColors.GREEN + "  " + ConsoleColors.CHECK_ICON + "  Лист успішно надіслано!"
+                        + ConsoleColors.RESET);
+        System.out.println();
+
+        ConsoleColors.printInline(ConsoleColors.YELLOW_BOLD,
+                "  📩  Введіть код з листа " + ConsoleColors.ARROW + " ");
         String inputCode = scanner.nextLine();
 
         if (!inputCode.equals(code)) {
-            ConsoleColors.print(ConsoleColors.RED, "❌ Невірний код! Спробуйте ще раз.");
+            ConsoleColors.print(ConsoleColors.RED_BOLD,
+                    "\n  " + ConsoleColors.ERROR_ICON + " Невірний код! Спробуйте ще раз.");
+            pressEnterToContinue();
             return null;
         }
 
-        // 🔥 2. РЕЄСТРАЦІЯ (Якщо код правильний)
+        // 🔥 2. РЕЄСТРАЦІЯ
         try {
             UserStoreDto userDto = new UserStoreDto(username, fullName, email, password, phone,
                     address);
             userService.registerUser(userDto);
 
-            // Дістаємо створеного юзера, щоб залогінити його
             User user = userService.findByUsername(username).orElseThrow();
-
-            // Зберігаємо сесію (щоб не виходило з аккаунту)
             SessionManager.saveSession(user);
 
-            return user; // Повертаємо юзера для авто-входу
+            ConsoleColors.print(ConsoleColors.GREEN_BOLD, "\n  " + ConsoleColors.CHECK_ICON
+                    + "  Акаунт успішно створено! Ласкаво просимо.");
+            Thread.sleep(1500); // Даємо час прочитати перед переходом в меню
+
+            return user;
 
         } catch (Exception e) {
-            ConsoleColors.print(ConsoleColors.RED, "❌ Помилка: " + e.getMessage());
+            ConsoleColors.print(ConsoleColors.RED_BOLD,
+                    "\n  " + ConsoleColors.ERROR_ICON + " Критична помилка: " + e.getMessage());
+            pressEnterToContinue();
             return null;
         }
+    }
+
+    // Допоміжний метод, щоб повідомлення про помилку не зникало миттєво
+    private void pressEnterToContinue() {
+        System.out.println(ConsoleColors.RESET + "\nНатисніть Enter, щоб продовжити...");
+        scanner.nextLine();
     }
 }
