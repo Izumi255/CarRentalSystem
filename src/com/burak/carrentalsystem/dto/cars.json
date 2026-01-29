@@ -4,8 +4,8 @@
     "brand": "Mercedes",
     "model": "Civic",
     "pricePerHour": 35.9,
-    "isAvailable": true,
-    "rentEndTime": 0
+    "isAvailable": false,
+    "rentEndTime": 1769616876575
   },
   {
     "id": "ca0484b1-2df8-47fb-a3b2-fe6f7f2cf312",
@@ -28,7 +28,7 @@
     "brand": "Honda",
     "model": "Civic",
     "pricePerHour": 42.59,
-    "isAvailable": false,
-    "rentEndTime": 1769622074172
+    "isAvailable": true,
+    "rentEndTime": 0
   }
 ]

@@ -58,15 +58,5 @@
     "phone": "+421111111111",
     "address": "zlatorh",
     "role": "ADMIN"
-  },
-  {
-    "id": "e91a5c84-2552-4f8d-99e2-c45322f93ca7",
-    "username": "gdf",
-    "fullName": "burak",
-    "password": "$2b$10$tMGKf5cyDVb7DKBG2hiOceVboqx.iDKoQ0q/u3/SWH29pk9EnmewS",
-    "email": "c.burak.dmytro@student.uzhnu.edu.ua",
-    "phone": "+421111111111",
-    "address": "zlatoro",
-    "role": "CUSTOMER"
   }
 ]

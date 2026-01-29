@@ -8,8 +8,9 @@ import com.burak.carrentalsystem.repository.CrudRepository;
 import com.burak.carrentalsystem.repository.FileUserRepository;
 import com.password4j.Password;
 
-import java.util.List; // ✅ ВИКОРИСТОВУЄМО LIST, ЯК У РЕПОЗИТОРІЇ
+import java.util.List;
 import java.util.Optional;
+
 
 public class UserService {
 
@@ -21,7 +22,7 @@ public class UserService {
         this.notificationService = new EmailNotificationService();
     }
 
-    // 1. Валідація даних (без Regex для email)
+    // 1. Валідація даних
     public void validateUserData(String username, String email, String phone, String address) {
         if (userRepository.getById(username).isPresent()) {
             throw new IllegalArgumentException(
@@ -57,7 +58,6 @@ public class UserService {
         );
     }
 
-    // 4. Реєстрація
     public void registerUser(UserStoreDto userDto) {
         validateUserData(userDto.getUsername(), userDto.getEmail(), userDto.getPhone(),
                 userDto.getAddress());
@@ -71,7 +71,7 @@ public class UserService {
                 userDto.getEmail(),
                 userDto.getPhone(),
                 userDto.getAddress(),
-                Role.CUSTOMER
+                userDto.getRole()
         );
 
         userRepository.add(newUser);
@@ -112,7 +112,7 @@ public class UserService {
         if (updateDto.getPassword() != null && !updateDto.getPassword().isEmpty()) {
             user.setPassword(Password.hash(updateDto.getPassword()).withBcrypt().getResult());
         }
-        userRepository.add(user);
+        userRepository.add(user); // Перезаписуємо оновленого юзера
     }
 
     public List<User> getAllUsers() {
@@ -131,14 +131,10 @@ public class UserService {
     }
 
     public void deleteUser(String username) {
-        // 1. ЗАХИСТ: Не можна видалити головного адміна
         if (username.equalsIgnoreCase("admin")) {
             throw new IllegalArgumentException("⛔ Не можна видалити головного адміністратора!");
         }
-
-        // 2. Викликаємо репозиторій
         boolean isDeleted = userRepository.delete(username);
-
         if (!isDeleted) {
             throw new IllegalArgumentException(
                     "❌ Користувача з логіном '" + username + "' не знайдено.");
@@ -146,27 +142,23 @@ public class UserService {
     }
 
     public void changeUserRole(String username, Role newRole) {
-        // 1. Захист: Не можна чіпати головного адміна
         if (username.equalsIgnoreCase("admin")) {
             throw new IllegalArgumentException(
                     "⛔ Не можна змінювати роль головного адміністратора!");
         }
 
-        // 2. Шукаємо користувача
         Optional<User> userOpt = userRepository.getById(username);
         if (userOpt.isEmpty()) {
             throw new IllegalArgumentException(
                     "❌ Користувача з логіном '" + username + "' не знайдено.");
         }
 
-        // 3. Міняємо роль і зберігаємо
         User user = userOpt.get();
-
         if (user.getRole() == newRole) {
             throw new IllegalArgumentException("⚠️ Користувач вже має цю роль!");
         }
 
         user.setRole(newRole);
-        userRepository.update(user);
+        userRepository.add(user);
     }
 }

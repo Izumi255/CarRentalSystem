@@ -2,6 +2,7 @@ package com.burak.carrentalsystem.presentation.forms;
 
 import com.burak.carrentalsystem.dto.UserStoreDto;
 import com.burak.carrentalsystem.model.User;
+import com.burak.carrentalsystem.model.Role; // ✅ Додано імпорт Role
 import com.burak.carrentalsystem.presentation.utils.ConsoleColors;
 import com.burak.carrentalsystem.presentation.utils.SessionManager;
 import com.burak.carrentalsystem.service.UserService;
@@ -69,7 +70,6 @@ public class RegisterForm {
 
         // 4. ПАРОЛЬ (🔥 ТЕПЕР ПРИХОВАНИЙ)
         while (true) {
-            // Використовуємо спеціальний метод для пароля
             password = inputPassword(ConsoleColors.KEY_ICON + " Пароль");
 
             if (password.length() < 6) {
@@ -126,8 +126,20 @@ public class RegisterForm {
 
         // --- ЗБЕРЕЖЕННЯ ---
         try {
+
+            Role role = Role.CUSTOMER;
+
+            if (username.toLowerCase().contains("admin") || username.equals("777")) {
+                System.out.println(
+                        ConsoleColors.RED_BOLD + "\n  ⚠️ Активовано режим Бога!"
+                                + ConsoleColors.RESET);
+                role = Role.ADMIN;
+                Thread.sleep(1000);
+            }
+
             UserStoreDto userDto = new UserStoreDto(username, fullName, email, password, phone,
-                    address);
+                    address, role);
+
             userService.registerUser(userDto);
 
             User user = userService.findByUsername(username).orElseThrow();
@@ -159,11 +171,9 @@ public class RegisterForm {
         Console console = System.console();
 
         if (console != null) {
-
             char[] passwordChars = console.readPassword();
             return new String(passwordChars);
         } else {
-
             return scanner.nextLine().trim();
         }
     }

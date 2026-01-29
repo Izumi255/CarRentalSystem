@@ -1,5 +1,7 @@
 package com.burak.carrentalsystem.dto;
 
+import com.burak.carrentalsystem.model.Role;
+
 public class UserStoreDto {
 
     private final String username;
@@ -8,16 +10,17 @@ public class UserStoreDto {
     private final String password;
     private final String phone;
     private final String address;
+    private final Role role;
 
-    // ✅ Конструктор тепер простенький і не "кусається"
     public UserStoreDto(String username, String fullName, String email, String password,
-            String phone, String address) {
+            String phone, String address, Role role) {
         this.username = username;
         this.fullName = fullName;
         this.email = email;
         this.password = password;
         this.phone = phone;
         this.address = address;
+        this.role = role;
     }
 
     public String getUsername() {
@@ -42,5 +45,9 @@ public class UserStoreDto {
 
     public String getAddress() {
         return address;
+    }
+
+    public Role getRole() {
+        return role;
     }
 }
